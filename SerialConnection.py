@@ -5,7 +5,13 @@ class SerialConnection:
         self.elements = elements
         self.x = None
         self.y = None
+        self.image_draw = None
         self.type = ElementType.SerialConnection
+
+    def set_image_draw(self, image_draw):
+        self.image_draw = image_draw
+        for element in self.elements:
+            element.set_image_draw(image_draw)
 
     def set_place(self, x, y):
         self.x = x

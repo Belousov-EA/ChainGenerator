@@ -1,14 +1,17 @@
 from  ElementType import ElementType
 
 class Element:
-    def __init__(self, w, h, p, image_draw):
+    def __init__(self, w, h, p):
         self.h = h
         self.w = w
         self.p = p
-        self.image_draw = image_draw
+        self.image_draw = None
         self.x = None
         self.y = None
         self.type = ElementType.Element
+
+    def set_image_draw(self, image_draw):
+        self.image_draw = image_draw
 
 
 

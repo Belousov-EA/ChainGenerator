@@ -1,13 +1,19 @@
 from  ElementType import ElementType
 
 class ParallelConnection:
-    def __init__(self, elements, padding, image_draw):
+    def __init__(self, elements, padding):
         self.elements = elements
         self.p = padding
-        self.image_draw = image_draw
+        self.image_draw = None
         self.x = None
         self.y = None
         self.type = ElementType.ParallelConnection
+
+    def set_image_draw(self, image_draw):
+        self.image_draw = image_draw
+        for element in self.elements:
+            element.set_image_draw(image_draw)
+
 
     def set_place(self, x, y):
         self.x = x

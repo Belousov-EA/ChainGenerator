@@ -9,57 +9,56 @@ from PIL import ImageDraw
 import math
 
 class Chain:
-    def __init__(self, image_size,
-                 element_width, element_height, element_padding,
-                 parallel_padding,
-                 input_point):
-        self.image_size = image_size
+    def __init__(self, element_width, element_height, element_padding,
+                 parallel_padding):
         self.element_width = element_width
         self.element_height = element_height
         self.element_padding = element_padding
         self.parallel_padding = parallel_padding
-        self.input_point = input_point
 
 
     def create_chain(self, max_elements, one_max):
-        image = Image.new("RGB", self.image_size, color=(255, 255, 255))
-        draw = ImageDraw.Draw(image)
 
         if random.randint(0, 1) == 0:
             element = SerialConnection([])
             for j in range(random.randint(2, one_max)):
-                element.elements.append(Element(self.element_width, self.element_height, self.element_padding, draw))
+                element.elements.append(Element(self.element_width, self.element_height, self.element_padding))
         else:
-            element = ParallelConnection([], self.parallel_padding, draw)
+            element = ParallelConnection([], self.parallel_padding)
             for j in range(random.randint(2, one_max)):
-                element.elements.append(Element(self.element_width, self.element_height, self.element_padding, draw))
+                element.elements.append(Element(self.element_width, self.element_height, self.element_padding))
 
         elements_count = self.get_element_number(element)
         while elements_count < max_elements:
-            self.change_element(element, random.randint(0, elements_count - 1), random.randint(2, min(max_elements - elements_count + 1, one_max)), draw)
+            self.change_element(element, random.randint(0, elements_count - 1), random.randint(2, min(max_elements - elements_count + 1, one_max)))
             elements_count = self.get_element_number(element)
-        element.set_place(*self.input_point)
+
+        image = Image.new("RGB", (element.get_w_size()+100, element.get_h_size()+100), color=(255, 255, 255))
+        draw = ImageDraw.Draw(image)
+
+        element.set_place(10, element.get_h_size()//2 + 50 )
+        element.set_image_draw(draw)
         element.draw()
         return image
 
 
-    def change_element(self, element, element_number, max_elements, draw):
+    def change_element(self, element, element_number, max_elements):
         for i in range( len( element.elements )):
             if element.elements[i].type == ElementType.Element:
                 if element_number == 0:
                     element_number -= 1
                     if element.type == ElementType.SerialConnection:
-                        element.elements[i] = ParallelConnection([], self.parallel_padding, draw)
+                        element.elements[i] = ParallelConnection([], self.parallel_padding)
                         for j in range(max_elements):
-                            element.elements[i].elements.append(Element(self.element_width, self.element_height, self.element_padding, draw))
+                            element.elements[i].elements.append(Element(self.element_width, self.element_height, self.element_padding))
                     if element.type == ElementType.ParallelConnection:
                         element.elements[i] = SerialConnection([])
                         for j in range(max_elements):
-                            element.elements[i].elements.append(Element(self.element_width, self.element_height, self.element_padding, draw))
+                            element.elements[i].elements.append(Element(self.element_width, self.element_height, self.element_padding))
                 else:
                     element_number -= 1
             else:
-                element_number = self.change_element(element.elements[i], element_number, max_elements, draw)
+                element_number = self.change_element(element.elements[i], element_number, max_elements)
         return element_number
 
 
