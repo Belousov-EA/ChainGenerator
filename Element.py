@@ -1,5 +1,6 @@
 from  ElementType import ElementType
 from PIL import ImageFont
+from math import exp
 
 class Element:
     def __init__(self, w, h, p):
@@ -55,3 +56,9 @@ class Element:
         self.exponent_param = exponent_param
         self.weibull_param_a = weibull_param_a
         self.weibull_param_b = weibull_param_b
+
+    def exp_count(self, t):
+        return exp(-self.exponent_param * float(t))
+
+    def weibull_count(self, t):
+        return exp(-((t / self.weibull_param_a) ** self.weibull_param_b))

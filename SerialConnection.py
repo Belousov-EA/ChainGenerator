@@ -43,3 +43,15 @@ class SerialConnection:
             if (max_h < element.get_h_size()):
                 max_h = element.get_h_size()
         return max_h
+
+    def exp_count(self, t):
+        p = 1
+        for element in self.elements:
+            p *= element.exp_count(t)
+        return p
+
+    def weibull_count(self, t):
+        p = 1
+        for element in self.elements:
+            p *= element.weibull_count(t)
+        return p

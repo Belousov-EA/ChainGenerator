@@ -70,3 +70,16 @@ class ParallelConnection:
             height += self.p
         height -= self.p    # delete last
         return height
+
+
+    def exp_count(self, t):
+        p = 1.
+        for element in self.elements:
+            p *= (1. - element.exp_count(t))
+        return 1. - p
+
+    def weibull_count(self, t):
+        p = 1
+        for element in self.elements:
+            p *= (1 - element.weibull_count(t))
+        return 1 - p

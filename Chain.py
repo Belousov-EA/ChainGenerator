@@ -6,7 +6,8 @@ from SerialConnection import SerialConnection
 from ParallelConnection import ParallelConnection
 from PIL import Image
 from PIL import ImageDraw
-import math
+from PIL import ImageFont
+from random import uniform
 
 class Chain:
     def __init__(self, element_width, element_height, element_padding,
@@ -15,13 +16,28 @@ class Chain:
         self.element_height = element_height
         self.element_padding = element_padding
         self.parallel_padding = parallel_padding
+        self.exp_params = None
+        self.weibull_params_a = None
+        self.weibull_params_b = None
 
-        self.gen_exponent_param = self.const_param
-        self.gen_weibull_param_a = self.const_param
-        self.gen_weibull_param_b = self.const_param
 
+    def create_chain(self, max_elements, one_max, variant,
+                     exp_min, exp_max,
+                     weibull_a_min, weibull_a_max,
+                     weibull_b_min, weibull_b_max,
+                     time_min, time_max):
+        self.exp_params = {}
+        self.weibull_params_a = {}
+        self.weibull_params_b = {}
 
-    def create_chain(self, max_elements, one_max):
+        self.exp_min = exp_min
+        self.exp_max = exp_max
+        self.weibull_a_min = weibull_a_min
+        self.weibull_a_max = weibull_a_max
+        self.weibull_b_min = weibull_b_min
+        self.weibull_b_max = weibull_b_max
+
+        count_time = uniform(time_min, time_max)
 
         if random.randint(0, 1) == 0:
             element = SerialConnection([])
@@ -37,21 +53,45 @@ class Chain:
             self.change_element(element, random.randint(0, elements_count - 1), random.randint(2, min(max_elements - elements_count + 1, one_max)))
             elements_count = self.get_element_number(element)
 
-        image = Image.new("RGB", (element.get_w_size()+100, element.get_h_size()+100), color=(255, 255, 255))
+        self.set_element_info(element, 1)
+        exponent_caption = 'exponent ' + str(self.exp_params)[1:-1]
+        weibull_a_caption = 'weibull a ' + str(self.weibull_params_a)[1:-1]
+        weibull_b_caption = 'weibull b ' + str(self.weibull_params_b)[1:-1]
+        font = ImageFont.truetype('arial.ttf', 14)
+
+        font_width = max(font.getsize(exponent_caption)[0], font.getsize(weibull_a_caption)[0], font.getsize(weibull_b_caption)[0])
+        image_width = max(element.get_w_size()+100, font_width+20)
+
+
+        image = Image.new("RGB", (image_width, element.get_h_size()+215), color=(255, 255, 255))
         draw = ImageDraw.Draw(image)
 
-        self.set_element_info(element, 1)
-        element.set_place(10, element.get_h_size()//2 + 50 )
+        element.set_place(10, element.get_h_size()//2 + 60 )
         element.set_image_draw(draw)
         element.draw()
+
+        variant_caption = 'Вариант {}'.format(variant)
+        draw.text(((image_width - font.getsize(variant_caption)[0])//2, 1), variant_caption, fill=(0, 0, 0), font=font)
+        draw.text((10, element.get_h_size()+110), exponent_caption, fill=(0, 0, 0), font=font)
+        draw.text((10, element.get_h_size() + 125), weibull_a_caption, fill=(0, 0, 0), font=font)
+        draw.text((10, element.get_h_size() + 140), weibull_b_caption, fill=(0, 0, 0), font=font)
+        draw.text((10, element.get_h_size() + 155), 'Время рассчета = {}'.format(round(count_time, 5)), fill=(0, 0, 0), font=font)
+        draw.text((10, element.get_h_size() + 185), 'Ответ {} exp = {}'.format(variant, round(element.exp_count(count_time), 5)), fill=(0, 0, 0), font=font)
+        draw.text((10, element.get_h_size() + 200), 'Ответ {} weibull = {}'.format(variant, round(element.weibull_count(count_time), 5)), fill=(0, 0, 0), font=font)
         return image
 
 
+    # setted numbers for elements, params for distributions
     def set_element_info(self, element, numered):
         if element.type == ElementType.Element:
-            exponent_param = self.gen_exponent_param()
-            weibull_param_a = self.gen_weibull_param_a()
-            weibull_param_b = self.gen_weibull_param_b()
+            exponent_param = uniform(self.exp_min, self.exp_max)
+            weibull_param_a = uniform(self.weibull_a_min, self.weibull_a_max)
+            weibull_param_b = uniform(self.weibull_b_min, self.weibull_b_max)
+
+            self.exp_params[numered] = round(exponent_param, 5)
+            self.weibull_params_a[numered] = round(weibull_param_a, 5)
+            self.weibull_params_b[numered] = round(weibull_param_b, 5)
+
             element.set_info(numered, exponent_param, weibull_param_a, weibull_param_b)
             return numered + 1
         else:
@@ -59,9 +99,6 @@ class Chain:
                 numered = self.set_element_info(e, numered)
             return numered
 
-
-    def const_param(self):
-        return 10
 
     def change_element(self, element, element_number, max_elements):
         for i in range( len( element.elements )):
