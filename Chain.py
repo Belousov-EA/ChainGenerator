@@ -16,6 +16,10 @@ class Chain:
         self.element_padding = element_padding
         self.parallel_padding = parallel_padding
 
+        self.gen_exponent_param = self.const_param
+        self.gen_weibull_param_a = self.const_param
+        self.gen_weibull_param_b = self.const_param
+
 
     def create_chain(self, max_elements, one_max):
 
@@ -36,11 +40,28 @@ class Chain:
         image = Image.new("RGB", (element.get_w_size()+100, element.get_h_size()+100), color=(255, 255, 255))
         draw = ImageDraw.Draw(image)
 
+        self.set_element_info(element, 1)
         element.set_place(10, element.get_h_size()//2 + 50 )
         element.set_image_draw(draw)
         element.draw()
         return image
 
+
+    def set_element_info(self, element, numered):
+        if element.type == ElementType.Element:
+            exponent_param = self.gen_exponent_param()
+            weibull_param_a = self.gen_weibull_param_a()
+            weibull_param_b = self.gen_weibull_param_b()
+            element.set_info(numered, exponent_param, weibull_param_a, weibull_param_b)
+            return numered + 1
+        else:
+            for e in element.elements:
+                numered = self.set_element_info(e, numered)
+            return numered
+
+
+    def const_param(self):
+        return 10
 
     def change_element(self, element, element_number, max_elements):
         for i in range( len( element.elements )):

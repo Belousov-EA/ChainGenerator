@@ -6,7 +6,7 @@ st.title('Генерирование схем ОТН')
 max_elements_number = st.slider('Максимальное количество элементов', 3, 50, 10)
 max_elements_number_per_connection = st.slider('Максимальное количество элементов в одном соединении', 2, max_elements_number, 3)
 
-chain = Chain(30, 10, 5, 10)
+chain = Chain(40, 20, 5, 10)
 image = chain.create_chain(max_elements_number, max_elements_number_per_connection)
 
 if st.button('Новая схема'):
