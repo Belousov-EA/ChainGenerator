@@ -1,3 +1,5 @@
+import os.path
+
 from  ElementType import ElementType
 from PIL import ImageFont
 from math import exp
@@ -32,7 +34,7 @@ class Element:
         self.image_draw.line((x, y, x + self.p, y), fill=(0, 0, 0), width=2 )
         self.image_draw.line((x + self.p + self.w, y, x + self.p + self.p + self.w, y), fill=(0, 0, 0), width=2)
         self.image_draw.rectangle((x + self.p, y - int(0.5 * self.h), x + self.p + self.w, y + int(0.5 * self.h)), outline=(0, 0, 0), width=2)
-        font = ImageFont.truetype('arial.ttf', self.h - 2)
+        font = ImageFont.truetype(os.path.join('fonts', 'arial.ttf'), self.h - 2)
         if self.number < 10:
             font_padding = (x + self.p + x + self.p + self.w)//2 - 5
         else:

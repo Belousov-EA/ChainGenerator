@@ -8,6 +8,7 @@ from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
 from random import uniform
+import os.path
 
 class Chain:
     def __init__(self, element_width, element_height, element_padding,
@@ -57,7 +58,7 @@ class Chain:
         exponent_caption = 'exponent ' + str(self.exp_params)[1:-1]
         weibull_a_caption = 'weibull a ' + str(self.weibull_params_a)[1:-1]
         weibull_b_caption = 'weibull b ' + str(self.weibull_params_b)[1:-1]
-        font = ImageFont.truetype('arial.ttf', 14)
+        font = ImageFont.truetype(os.path.join('fonts', 'arial.ttf'), 14)
 
         font_width = max(font.getsize(exponent_caption)[0], font.getsize(weibull_a_caption)[0], font.getsize(weibull_b_caption)[0])
         image_width = max(element.get_w_size()+100, font_width+20)
